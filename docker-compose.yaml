@@ -1,0 +1,26 @@
+version: "2"
+services:
+  jobmanager:
+    image: flink:scala_2.12-java8
+    expose:
+      - "6123"
+    ports:
+      - "8081:8081"
+    command: jobmanager
+
+  taskmanager:
+    image: flink:scala_2.12-java8
+    expose:
+      - "6121"
+      - "6122"
+    depends_on:
+      - jobmanager
+    command: taskmanager
+
+  jobsubmitter:
+    image: flink:scala_2.12-java8
+    depends_on:
+      - jobmanager
+    volumes:
+      - ./target:/job
+    entrypoint: /opt/flink/bin/flink run -c twitter_streaming.StreamingJob /job/twitter-flink-project-0.1.jar
